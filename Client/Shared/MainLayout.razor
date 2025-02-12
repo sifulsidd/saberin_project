@@ -1,5 +1,74 @@
 ﻿@inherits LayoutComponentBase
 
+@using music_manager_starter.Shared
+
+@inject HttpClient Http
+
+@code{
+    //whether we searched something or not
+    bool isSearched = false;
+    private List<Song> songs;
+    private List<Song> filteredSongs;
+    private string searchedWord;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        songs = await Http.GetFromJsonAsync<List<Song>>("api/songs");
+        filteredSongs = new List<Song>();
+    }
+
+    public bool showMoreInfo = false;
+
+    private void DisplayAll()
+    {
+        
+        isSearched = false;
+    }
+
+    private void DisplayInformation()
+    {
+        showMoreInfo = !showMoreInfo;
+    }
+
+    private void OnSearchKeyDown(KeyboardEventArgs e)
+    {
+        
+        // Only trigger search if the Enter key is pressed
+        if (e.Key == "Enter")
+        {
+
+            //clears the table for a new table to be created
+            //if searched result is null or empty, basically return our whole list
+            isSearched = !string.IsNullOrEmpty(searchedWord);
+            filteredSongs.Clear();
+
+            //clears the playlists so we can start with a brand new one
+            //this creates our filtered songs list
+            foreach (var song in songs)
+            {
+                // Error was being received so null check verifies no null or empty search parameter
+                if (!string.IsNullOrEmpty(searchedWord))
+                {
+                    string comparedWord = searchedWord.ToUpper();
+                    if (song.Title.ToUpper().Contains(comparedWord) || song.Album.ToUpper().Contains(comparedWord) || song.Artist.ToUpper().Contains(comparedWord) || song.Genre.ToUpper().Contains(comparedWord))
+                    {
+                        filteredSongs.Add(song);
+                        // Console.WriteLine(searchedWord);
+                        // Console.WriteLine($"Title: {song.Title.Contains(searchedWord)}");
+                        // Console.WriteLine($"Genre: {song.Genre.Contains(searchedWord)}");
+                        // Console.WriteLine($"Album: {song.Album.Contains(searchedWord)}");
+                        // Console.WriteLine($"Artist: {song.Artist.Contains(searchedWord)}");
+
+                    }
+
+                }
+
+            }
+            StateHasChanged();
+        }
+    }
+}
 
 <div class="flex h-screen">
     <NavMenu />
@@ -7,7 +76,8 @@
         <div class="top-bar px-6 py-4 bg-gray-900 text-white flex items-center justify-between">
             <h1 class="text-xl font-semibold">Music</h1>
             <div class="relative">
-                <input type="text" placeholder="Search..." class="bg-gray-700 text-white px-4 py-2 rounded-full focus:outline-none">
+                 @* bind makes the input become the searched word we initialized *@
+                <input type="text" placeholder="Search..." class="bg-gray-700 text-white px-4 py-2 rounded-full focus:outline-none" @bind="searchedWord" @onkeydown="OnSearchKeyDown">
                 <span class="absolute right-3 top-3 text-gray-400">
                     <i class="fas fa-search"></i>
                 </span>
@@ -15,7 +85,59 @@
         </div>
 
         <div class="p-0 overflow-y-auto flex-1">
-            @Body
+            @if (!isSearched)
+            {
+                @Body
+            }
+            else
+            {
+                <div class="p-0 min-h-screen bg-pattern flex flex-col items-center justify-center">
+                    <h2 class="text-3xl font-bold text-white mb-8 text-center">Song Library</h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        @if (filteredSongs != null && filteredSongs.Count > 0)
+                        {
+                            
+
+                            <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg" @onclick="DisplayInformation">
+                                @* if it's true we want less information hence show less *@
+                                @* else we want more information *@
+                                @if (showMoreInfo)
+                                {
+                                    <span>Show Less</span>
+                                }
+                                else
+                                {
+                                    <span>Show More</span>
+                                }
+                            </button>
+                            @foreach (var song in filteredSongs)
+                            {
+                                <div class="glass p-6 border border-gray-300 rounded-lg text-white transition-transform transform hover:scale-105 hover:shadow-xl cursor-pointer">
+                                    <h3 class="text-xl font-semibold mb-2">@song.Title</h3>
+                                    <p class="text-md">Artist: <span class="font-light">@song.Artist</span></p>
+                                    @*This part is to display more info if each item is clicked, it constantly switches from true to false*@
+                                    @if (showMoreInfo)
+                                    {
+                                        <p class="text-md">Album: <span class="font-light">@song.Album</span></p>
+                                        <p class="text-md">Genre: <span class="font-light">@song.Genre</span></p>
+                                    }
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-span-1 text-center text-gray-400">No songs found.</div>
+                            
+                        }
+                        <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg" @onclick="DisplayAll">
+                            Show All Songs
+                        </button>
+
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
