@@ -29,18 +29,16 @@
             <InputText @bind-Value="newSong.Genre" class="mt-1 block w-full p-2 border rounded" />
         </div>
         
-        @* rating dropdown for songs being displayed*@
-        <div class="mb-4">
-           <label class="block text-gray-200">Rating</label>
-            <InputSelect @bind-Value="newSong.Rating" class="mt-1 block w-full p-2 border rounded">
-                <option value="0">Select a Rating</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-            </InputSelect>
-        </div>
+        @* rating dropdown for songs being displayed *@
+        @* <div class="mb-4"> *@
+        @*    <label class="block text-gray-200">Rating</label> *@
+        @*     <InputSelect @bind-Value="newSong.Rating" class="mt-1 block w-full p-2 border rounded"> *@
+        @*         <option value="0">Select a Rating</option> *@
+        @*         @for(int i = 0; i <= 5; i++){ *@
+        @*             <option value="@i">@i</option> *@
+        @*         } *@
+        @*     </InputSelect> *@
+        @* </div> *@
 
         <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded">Add Song</button>
     </EditForm>
