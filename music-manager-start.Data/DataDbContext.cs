@@ -30,7 +30,7 @@ namespace music_manager_starter.Data
             );
 
             //added data for the playlist model
-            modelBuilder.Entity<Song>().HasData(
+            modelBuilder.Entity<PlayList>().HasData(
             new PlayList { Id = Guid.Parse("7747c84f-4a7d-4e83-8b8f-1829f0eafca3"), Name = "Summertime", Owner = "Snow"},
             new PlayList { Id = Guid.Parse("2a18a0b1-b3e1-4ff0-9aa5-5f5e4c81bc45"), Name = "Wintertime", Owner = "Summer" }
             );

@@ -1,0 +1,49 @@
+﻿@page "/AddPlayList"
+@inject HttpClient Http
+@using music_manager_starter.Shared
+
+
+<div class="p-6">
+    <h2 class="text-xl font-semibold text-white">Add New PlayList</h2>
+    <EditForm Model="newPlayList" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+
+        <ValidationSummary />
+
+        <div class="mb-4">
+            <label class="block text-gray-200">Playlist Name</label>
+            <InputText @bind-Value="newPlayList.Name" class="mt-1 block w-full p-2 border rounded" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-200">Playlist Owner</label>
+            <InputText @bind-Value="newPlayList.Owner" class="mt-1 block w-full p-2 border rounded" />
+        </div>
+
+        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded">Add Playlist</button>
+    </EditForm>
+
+    @if (message != null)
+    {
+        <p class="mt-4 text-green-500">@message</p>
+    }
+</div>
+
+@code {
+    private PlayList newPlayList = new PlayList();
+    private string message;
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("api/playlists", newPlayList);
+        if (response.IsSuccessStatusCode)
+        {
+            message = "Playlist added successfully!";
+            newPlayList = new PlayList(); 
+        }
+        else
+        {
+            message = "Error adding playlist. Please try again.";
+        }
+    }
+}
